@@ -4,7 +4,7 @@ import { userAuth } from "../middlewares/userAuth.middleware.js";
 import { isStudentAuth } from "../middlewares/isStudentAuth.middleware.js";
 import { isAdminAuth } from "../middlewares/isAdminAuth.middleware.js";
 import { registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout } from "../controllers/user.controller.js";
-import { requestLOR } from "../controllers/student.controller.js";
+import { requestLOR, getAllLorsOfLoggedInUser } from "../controllers/student.controller.js";
 import { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR } from "../controllers/admin.controller.js";
 
 
@@ -28,6 +28,7 @@ router.route("/logout").post(userAuth, logout);
 // #######################   STUDENT SECURED ROUTES ############################
 
 router.route("/requestLOR").post(userAuth, isStudentAuth, requestLOR);
+router.route("/getAllLorsOfLoggedInUser").get(userAuth, isStudentAuth, getAllLorsOfLoggedInUser);
 
 
 //  #######################   ADMIN SECURED ROUTES   ####################### 
