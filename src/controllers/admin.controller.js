@@ -184,12 +184,14 @@ const approveLORrequest = async (req, res) => {
             });
         }
 
+/*
         if (!lor.recipientDepartment) {
             return res.status(403).json({
                 status: 403,
                 message: "Operation declined: recipient department missing"
             });
         }
+*/
 
         // Finding User data from lor
         const { user } = lor;

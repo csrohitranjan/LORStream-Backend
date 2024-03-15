@@ -203,12 +203,13 @@ const updateProfile = async (req, res) => {
 
         // Determine which field is already registered and return corresponding response
         if (existingUser) {
-            if (existingUser.email === email) {
+            if (email !== undefined && existingUser.email === email) {
                 return res.status(409).json({
                     status: 409,
                     message: "Email is already registered"
                 });
-            } else {
+            }
+            if (phoneNumber !== undefined && existingUser.phoneNumber === phoneNumber) {
                 return res.status(409).json({
                     status: 409,
                     message: "Phone number is already registered"
