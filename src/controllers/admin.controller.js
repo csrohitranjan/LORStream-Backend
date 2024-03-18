@@ -1,10 +1,10 @@
 import { User } from "../models/user.model.js";
 import { Lor } from "../models/lor.model.js";
-import fs from "fs"
-import handlebars from "handlebars";
-import pdf from 'html-pdf';
-import { uploadOnCloudinary } from "../utils/cloudinary.js"
-import { generateReferenceNumber } from "../utils/generateReferenceNumber.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { generateReferenceNumber } from "../utils/generateReferenceNumber.js";
+import { generatePdfFromTemplate } from "../utils/generatePdfFromTemplate.js";
+import fs from "fs";
+
 
 
 const registerAsAdmin = async (req, res) => {
@@ -54,8 +54,6 @@ const registerAsAdmin = async (req, res) => {
             }
         }
 
-
-
         const insertedUser = await User.create({
             fullName,
             fatherName: 'NA',
@@ -88,7 +86,6 @@ const registerAsAdmin = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error)
         return res.status(500).json({
             status: 500,
             message: "Internal Server Error on: registerAsAdmin Controller"
@@ -158,6 +155,7 @@ const updateLORrequest = async (req, res) => {
 
 const approveLORrequest = async (req, res) => {
     try {
+        // Extract LOR ID from request parameters
         const lorId = req.params.lorId;
 
         // Find the LOR and populate the user details
@@ -173,34 +171,30 @@ const approveLORrequest = async (req, res) => {
         if (lor.status === "approved") {
             return res.status(403).json({
                 status: 403,
-                message: "Operation declined. LOR already approved"
+                message: "Operation declined: LOR already approved"
             });
         }
 
         if (!lor.recipient) {
             return res.status(403).json({
                 status: 403,
-                message: "Operation declined. recipient missing"
+                message: "Operation declined: Recipient missing"
             });
         }
 
-/*
-        if (!lor.recipientDepartment) {
-            return res.status(403).json({
-                status: 403,
-                message: "Operation declined: recipient department missing"
-            });
-        }
-*/
-
-        // Finding User data from lor
+        // Finding user data from that lor
         const { user } = lor;
 
-        // Generate reference number
+        // Generate reference number for the LOR
         const { referenceNumber, nextCount } = await generateReferenceNumber(user);
         lor.referenceNumber = referenceNumber;
 
+        // Convert image to base64-encoded string
+        const imageBase64 = fs.readFileSync('./src/templates/sxcLogo.jpg', 'base64');
+
+        // Creating an Object that Hold all data of LOR
         const templateData = {
+            image: imageBase64, // Add image data to template data
             referenceNumber: referenceNumber,
             recipient: lor.recipient,
             recipientDepartment: lor.recipientDepartment,
@@ -216,45 +210,38 @@ const approveLORrequest = async (req, res) => {
             // Add other LOR request details here...
         };
 
-        // Render the template with data
-        const templateHtml = fs.readFileSync('./src/templates/cs_template.hbs', 'utf8');
-        const template = handlebars.compile(templateHtml);
-        const renderedHtml = template(templateData);
+        // Path of HTML template file
+        const templatePath = './src/templates/templateWithoutRecipientDepartment.html';
 
-        // Generate PDF
+        // Path where generated PDF will be Saved
         const pdfFileName = `${nextCount}_${user.examRollNumber}.pdf`; // File name for the PDF
-        const pdfFilePath = `./public/${pdfFileName}`; // File path where PDF will be saved
+        const outputPath = `./public/${pdfFileName}`;
 
-        pdf.create(renderedHtml, { format: 'A4' }).toFile(pdfFilePath, async (err, _) => {
-            if (err) {
-                console.error('Error generating PDF:', err);
-                return res.status(500).json({ error: 'Error generating PDF' });
-            }
+        // Generate PDF from template and save to outputPath
+        await generatePdfFromTemplate(templatePath, templateData, outputPath);
+        const uplodedPdf = await uploadOnCloudinary(outputPath, pdfFileName);
 
-            const uplodedPdf = await uploadOnCloudinary(pdfFilePath, pdfFileName)
+        if (!uplodedPdf) {
+            console.log("upload File Missing");
+        }
 
-            if (!uplodedPdf) {
-                console.log("upload File Missing");
-            }
+        lor.lorPdfLink = uplodedPdf.url;
+        lor.status = 'approved';
+        lor.approvedBy = 'Admin' // In later I will change this.
 
-            lor.lorPdfLink = uplodedPdf.url;
-
-            // Update current status to approved
-            lor.status = 'approved';
-            lor.approvedBy = 'Admin' // Later on I will change this
-
-            // Save the updated LOR request
-            await lor.save();
-
-            return res.status(200).json({
-                status: 200,
-                message: "LOR request approved successfully",
-                lor
-            })
+        // Save the updated LOR request
+        await lor.save();
+        // Return success response
+        return res.status(200).json({
+            status: 200,
+            message: "LOR request approved successfully",
+            lor
         });
     } catch (error) {
-        console.error("Error approving LOR request:", error);
-        return res.status(500).json({ message: 'Internal server error on approveLORrequest controller' });
+        return res.status(500).json({
+            status: 500,
+            message: 'Internal server error on approveLORrequest controller'
+        });
     }
 };
 
@@ -299,7 +286,10 @@ const rejectLORrequest = async (req, res) => {
 
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal server error on rejectLORrequest Controller ' });
+        return res.status(500).json({
+            status: 500,
+            message: 'Internal server error on rejectLORrequest Controller'
+        });
     }
 }
 
@@ -336,6 +326,7 @@ const getAllApprovedLOR = async (req, res) => {
         });
     }
 };
+
 
 
 const getAllRejectedLOR = async (req, res) => {
