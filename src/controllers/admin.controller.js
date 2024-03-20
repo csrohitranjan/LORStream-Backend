@@ -178,7 +178,8 @@ const approveLORrequest = async (req, res) => {
         if (!lor.recipient) {
             return res.status(403).json({
                 status: 403,
-                message: "Operation declined: Recipient missing"
+                message: "Operation declined: Recipient missing",
+                message2: "If Necessary you can also set Recipent Department ( Optional )"
             });
         }
 
@@ -211,7 +212,12 @@ const approveLORrequest = async (req, res) => {
         };
 
         // Path of HTML template file
-        const templatePath = './src/templates/templateWithoutRecipientDepartment.html';
+        let templatePath;
+        if (templateData.recipientDepartment !== undefined) {
+            templatePath = './src/templates/csLORtemplateWithRecipientDepartment.html'
+        } else {
+            templatePath = './src/templates/csLORtemplateWithoutRecipientDepartment.html'
+        }
 
         // Path where generated PDF will be Saved
         const pdfFileName = `${nextCount}_${user.examRollNumber}.pdf`; // File name for the PDF
@@ -219,13 +225,16 @@ const approveLORrequest = async (req, res) => {
 
         // Generate PDF from template and save to outputPath
         await generatePdfFromTemplate(templatePath, templateData, outputPath);
+
+        // Upload Generated PDF to the ClOud
+        /*
         const uplodedPdf = await uploadOnCloudinary(outputPath, pdfFileName);
 
         if (!uplodedPdf) {
             console.log("upload File Missing");
         }
-
-        lor.lorPdfLink = uplodedPdf.url;
+        */
+        // lor.lorPdfLink = uplodedPdf.url;
         lor.status = 'approved';
         lor.approvedBy = 'Admin' // In later I will change this.
 
@@ -264,14 +273,14 @@ const rejectLORrequest = async (req, res) => {
         if (lor.status === "approved") {
             return res.status(403).json({
                 status: 404,
-                message: "Operation declined. LOR already approved - You can't Reject it"
+                message: "Operation declined: LOR already approved - You can't Reject it"
             });
         }
 
         if (lor.status === "rejected") {
             return res.status(403).json({
                 status: 404,
-                message: "Operation declined. LOR already rejected"
+                message: "Operation declined: LOR already rejected"
             });
         }
 
@@ -297,7 +306,7 @@ const rejectLORrequest = async (req, res) => {
 
 const getAllPendingLOR = async (req, res) => {
     try {
-        const pendingLORs = await Lor.find({ status: 'pending' }).populate('user');
+        const pendingLORs = await Lor.find({ status: 'pending' }).populate('user', '-password -refreshToken');
         return res.status(200).json({
             status: 200,
             pendingLORs
@@ -314,7 +323,7 @@ const getAllPendingLOR = async (req, res) => {
 
 const getAllApprovedLOR = async (req, res) => {
     try {
-        const approvedLORs = await Lor.find({ status: 'approved' }).populate('user');
+        const approvedLORs = await Lor.find({ status: 'approved' }).populate('user', '-password -refreshToken');
         return res.status(200).json({
             status: 200,
             approvedLORs
@@ -331,7 +340,7 @@ const getAllApprovedLOR = async (req, res) => {
 
 const getAllRejectedLOR = async (req, res) => {
     try {
-        const rejectedLORs = await Lor.find({ status: 'rejected' }).populate('user');
+        const rejectedLORs = await Lor.find({ status: 'rejected' }).populate('user', '-password -refreshToken');
         return res.status(200).json({
             status: 200,
             rejectedLORs

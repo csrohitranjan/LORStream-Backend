@@ -33,12 +33,10 @@
             margin-bottom: 20px;
         }
 
-        /* Rohit */
         .letter-header p {
             margin: 5px 15px;
         }
 
-        /* Rohit */
         .department-info p:not(:nth-child(3)) {
             font-weight: bold;
             font-size: 18px;
@@ -48,7 +46,6 @@
         /* Control Logo Left Right Form Here */
         .college-logo {
             width: 120px;
-            /* margin: 0 0 0 0; */
             /* margin: 20px 30px 0 30px; */
             /*Adjust margin to move logo slightly to the right*/
         }
@@ -78,6 +75,11 @@
             text-align: justify;
         }
 
+        .letter-body p {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
         .signature-block {
             font-size: 1.1em;
             margin-top: 40px;
@@ -89,9 +91,8 @@
             margin: 5px 0;
         }
 
-        /* Horizontal line style */
         .horizontal-line {
-            border-bottom: 2px solid black;
+            border: 1px solid black;
             margin-top: 10px;
             margin-bottom: 20px;
         }
@@ -126,6 +127,7 @@
         <div class="letter-body">
             <p>To</p>
             <p>{{recipient}},</p>
+            <p>{{recipientDepartment}},</p>
             <p>{{companyName}},</p>
             <p>{{companyAddress}}</p>
             <p>Sub: - <span>Permission regarding internship in your esteemed organization</span>.</p>
