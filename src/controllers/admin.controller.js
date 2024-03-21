@@ -234,7 +234,9 @@ const approveLORrequest = async (req, res) => {
 
         lor.lorPdfLink = uplodedPdf.url;
         lor.status = 'approved';
-        lor.approvedBy = 'Admin' // In later I will change this.
+
+        const approvingUser = req.user;
+        lor.approvedBy = approvingUser.fullName;
 
         await lor.save();
 
