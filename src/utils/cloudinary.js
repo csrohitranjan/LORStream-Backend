@@ -1,7 +1,7 @@
-import { v2 as cloudinary } from 'cloudinary';
-import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();
+import { v2 as cloudinary } from 'cloudinary';
+import fs from "fs";
 
 
 
@@ -13,27 +13,25 @@ cloudinary.config({
 });
 
 const uploadOnCloudinary = async (pdfFilePath, originalFilename) => {
-    try {
-        if (!pdfFilePath) return null;
+    if (!pdfFilePath) return null;
 
-        // Specify the public_id to use the original filename
+    try {
         const response = await cloudinary.uploader.upload(pdfFilePath, {
             resource_type: 'auto',
             public_id: originalFilename
         });
-
-        // File uploaded successfully, Now Delete that File from Local
-        fs.unlinkSync(pdfFilePath)
         return response;
     } catch (error) {
-        console.log("File Upload Failed on Cloudinary");
-        fs.unlinkSync(pdfFilePath)
+        console.log("File Upload Failed on Cloudinary:", error);
         return null;
+    } finally {
+        try {
+            await fs.promises.unlink(pdfFilePath);
+            console.log("Local File Deleted Successfully");
+        } catch (error) {
+            console.log("Error Deleting Local File:", error);
+        }
     }
 };
 
-
-
-
-
-export { uploadOnCloudinary }
+export { uploadOnCloudinary };

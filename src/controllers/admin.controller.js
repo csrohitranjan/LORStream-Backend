@@ -178,8 +178,7 @@ const approveLORrequest = async (req, res) => {
         if (!lor.recipient) {
             return res.status(403).json({
                 status: 403,
-                message: "Operation declined: Recipient missing",
-                message2: "If Necessary you can also set Recipent Department ( Optional )"
+                message: "Operation declined: Recipient and Recipent Department (Optional) Missing",
             });
         }
 
@@ -226,21 +225,19 @@ const approveLORrequest = async (req, res) => {
         // Generate PDF from template and save to outputPath
         await generatePdfFromTemplate(templatePath, templateData, outputPath);
 
-        // Upload Generated PDF to the ClOud
-        /*
+        // Upload Generated PDF to the Cloudinary ClOud
         const uplodedPdf = await uploadOnCloudinary(outputPath, pdfFileName);
 
         if (!uplodedPdf) {
-            console.log("upload File Missing");
+            console.log("Uploaded PDF File Missing");
         }
-        */
-        // lor.lorPdfLink = uplodedPdf.url;
+
+        lor.lorPdfLink = uplodedPdf.url;
         lor.status = 'approved';
         lor.approvedBy = 'Admin' // In later I will change this.
 
-        // Save the updated LOR request
         await lor.save();
-        // Return success response
+
         return res.status(200).json({
             status: 200,
             message: "LOR request approved successfully",
