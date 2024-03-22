@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
-dotenv.config();
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 
+
+dotenv.config();
 
 
 cloudinary.config({
@@ -26,12 +27,14 @@ const uploadOnCloudinary = async (pdfFilePath, originalFilename) => {
         return null;
     } finally {
         try {
-            await fs.promises.unlink(pdfFilePath);
+            fs.unlinkSync(pdfFilePath);
             console.log("Local File Deleted Successfully");
         } catch (error) {
             console.log("Error Deleting Local File:", error);
         }
     }
 };
+
+
 
 export { uploadOnCloudinary };
