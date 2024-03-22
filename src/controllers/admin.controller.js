@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import { Lor } from "../models/lor.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnFirebase } from "../utils/firebase.js";
 import { generateReferenceNumber } from "../utils/generateReferenceNumber.js";
 import { generatePdfFromTemplate } from "../utils/generatePdfFromTemplate.js";
 import fs from "fs";
@@ -225,14 +226,21 @@ const approveLORrequest = async (req, res) => {
         // Generate PDF from template and save to outputPath
         await generatePdfFromTemplate(templatePath, templateData, outputPath);
 
-        // Upload Generated PDF to the Cloudinary ClOud
-        const uplodedPdf = await uploadOnCloudinary(outputPath, pdfFileName);
+        // ##########   PDF Uploading to Cloud -- START ###########
 
+        // Upload PDF to Cloudinary Cloud
+        // const uplodedPdf = await uploadOnCloudinary(outputPath, pdfFileName);
+
+        // Upload PDF to FireBase Cloud
+        const uplodedPdf = await uploadOnFirebase(outputPath, pdfFileName);
+
+        // ##########   PDF Uploading to Cloud -- END ###########
         if (!uplodedPdf) {
             console.log("Uploaded PDF File Missing");
         }
 
-        lor.lorPdfLink = uplodedPdf.url;
+        // If File is Uploded Through Clodinary then we have to use this here --> uplodedPdf.url
+        lor.lorPdfLink = uplodedPdf;
         lor.status = 'approved';
 
         const approvingUser = req.user;
