@@ -4,6 +4,9 @@ import { generateAccessAndRefreshTokens } from "../utils/generateAccessAndRefres
 
 
 
+const home = (req, res) => {
+    res.status(200).send("<h1>Welcome to my Project's Controller Page</h1>");
+};
 
 
 
@@ -355,4 +358,4 @@ const logout = async (req, res) => {
 
 
 
-export { registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout }
+export { home, registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout }

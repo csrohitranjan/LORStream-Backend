@@ -22,6 +22,11 @@ import userRouter from "./routes/user.routes.js";
 
 // ##########      Routes Declaration   ############################
 
+app.get('/', (req, res) => {
+    res.status(200).send("<h1>This is Home Page</h1>");
+});
+
+
 app.use("/api/v2/users", userRouter);
 
 
