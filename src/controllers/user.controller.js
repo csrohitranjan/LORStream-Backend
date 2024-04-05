@@ -5,7 +5,7 @@ import { generateAccessAndRefreshTokens } from "../utils/generateAccessAndRefres
 
 
 const home = (req, res) => {
-    res.status(200).send("<h1>Welcome to my Project's Controller Page</h1>");
+    return res.status(200).send("<h1>Welcome to User Controllers Page</h1>");
 };
 
 
@@ -74,7 +74,8 @@ const registerUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal Server Error on: registerUser Controller"
+            message: "Internal Server Error on: registerUser Controller",
+            error
         });
     }
 };
@@ -141,7 +142,8 @@ const loginUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal server error occurred in login Controller."
+            message: "Internal server error occurred in login Controller.",
+            error
         });
     }
 };
@@ -189,7 +191,8 @@ const forgetPassword = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal server error occurred on forget password controller."
+            message: "Internal server error occurred on forget password controller.",
+            error
         });
     }
 };
@@ -264,7 +267,8 @@ const updateProfile = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal server error occurred in updateProfile Controller"
+            message: "Internal server error occurred in updateProfile Controller",
+            error
         });
     }
 };
@@ -272,82 +276,106 @@ const updateProfile = async (req, res) => {
 
 
 const changePassword = async (req, res) => {
-    const { oldPassword, newPassword } = req.body
+    try {
+        const { oldPassword, newPassword } = req.body
 
-    if (!oldPassword || !newPassword) {
-        return res.status(400).json({
-            status: 400,
-            message: "Old Password & New Password are required"
-        })
-    }
-
-    if (oldPassword === newPassword) {
-        return res.status(401).json({
-            status: 401,
-            message: "Old Password & New Password Can not be Same"
-        })
-    }
-
-    const user = await User.findById(req.user?._id)
-
-    const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword)
-
-    if (!isOldPasswordCorrect) {
-        return res.status(400)
-            .json({
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({
                 status: 400,
-                message: "Invalid Old Password"
+                message: "Old Password & New Password are required"
             })
+        }
+
+        if (oldPassword === newPassword) {
+            return res.status(401).json({
+                status: 401,
+                message: "Old Password & New Password Can not be Same"
+            })
+        }
+
+        const user = await User.findById(req.user?._id)
+
+        const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+
+        if (!isOldPasswordCorrect) {
+            return res.status(400)
+                .json({
+                    status: 400,
+                    message: "Invalid Old Password"
+                })
+        }
+
+        user.password = newPassword
+        await user.save({ validateBeforeSave: false })
+
+        return res.status(200)
+            .json({
+                status: 200,
+                message: "Password Changed Successfully"
+            })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error occurred in changePassword Controller",
+            error
+        });
     }
-
-    user.password = newPassword
-    await user.save({ validateBeforeSave: false })
-
-    return res.status(200)
-        .json({
-            status: 200,
-            message: "Password Changed Successfully"
-        })
 }
 
 
 
 const getCurrentUser = (req, res) => {
-    return res.status(200)
-        .json({
-            status: 200,
-            message: "Current User Fetched Successfully",
-            user: req.user
-        })
+    try {
+        return res.status(200)
+            .json({
+                status: 200,
+                message: "Current User Fetched Successfully",
+                user: req.user
+            })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error occurred in getCurrentUser Controller",
+            error
+        });
+    }
 }
 
 
 
 const logout = async (req, res) => {
-    await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set: {
-                refreshToken: undefined
+    try {
+        await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: {
+                    refreshToken: undefined
+                }
+            },
+            {
+                new: true
             }
-        },
-        {
-            new: true
+        )
+
+        const options = {
+            httpOnly: true,
+            secure: true
         }
-    )
 
-    const options = {
-        httpOnly: true,
-        secure: true
+        return res.status(200)
+            .clearCookie("accessToken", options)
+            .clearCookie("refreshToken", options)
+            .json({
+                status: 200,
+                message: "User Logged Out"
+            })
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error occurred in logout Controller",
+            error
+        });
     }
-
-    return res.status(200)
-        .clearCookie("accessToken", options)
-        .clearCookie("refreshToken", options)
-        .json({
-            status: 200,
-            message: "User Logged Out"
-        })
 
 }
 

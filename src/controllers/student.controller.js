@@ -34,8 +34,11 @@ const requestLOR = async (req, res) => {
             companyName, companyAddress
         });
     } catch (error) {
-        console.error("Error requesting LOR:", error);
-        return res.status(500).json({ message: "Internal server error on requestLOR Controller." });
+        return res.status(500).json({
+            status: 500,
+            message: "Internal server error on requestLOR Controller.",
+            error
+        });
     }
 };
 
@@ -58,7 +61,8 @@ const getAllLorsOfLoggedInUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal Server Error on getAllLorsofLoggedInUser Controller"
+            message: "Internal Server Error on getAllLorsofLoggedInUser Controller",
+            error
         });
     }
 };

@@ -89,7 +89,8 @@ const registerAsAdmin = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal Server Error on: registerAsAdmin Controller"
+            message: "Internal Server Error on: registerAsAdmin Controller",
+            error
         });
     }
 }
@@ -147,7 +148,8 @@ const updateLORrequest = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal server error occurred in updateLORrequest Controller"
+            message: "Internal server error occurred in updateLORrequest Controller",
+            error
         });
     }
 }
@@ -256,7 +258,8 @@ const approveLORrequest = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: 'Internal server error on approveLORrequest controller'
+            message: 'Internal server error on approveLORrequest controller',
+            error
         });
     }
 };
@@ -304,7 +307,8 @@ const rejectLORrequest = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: 'Internal server error on rejectLORrequest Controller'
+            message: 'Internal server error on rejectLORrequest Controller',
+            error
         });
     }
 }
@@ -321,7 +325,8 @@ const getAllPendingLOR = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal Server Error on getAllPendingLOR Controller"
+            message: "Internal Server Error on getAllPendingLOR Controller",
+            error
         });
     }
 };
@@ -338,7 +343,8 @@ const getAllApprovedLOR = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal Server Error on getAllApprovedLOR Controller"
+            message: "Internal Server Error on getAllApprovedLOR Controller",
+            error
         });
     }
 };
@@ -355,7 +361,8 @@ const getAllRejectedLOR = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
-            message: "Internal Server Error on getAllApprovedLOR Controller"
+            message: "Internal Server Error on getAllApprovedLOR Controller",
+            error
         });
     }
 }

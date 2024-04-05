@@ -23,7 +23,7 @@ import userRouter from "./routes/user.routes.js";
 // ##########      Routes Declaration   ############################
 
 app.get('/', (req, res) => {
-    res.status(200).send("<h1>This is Home Page</h1>");
+    res.status(200).send("<h1>Welcome to College ERP Project</h1>");
 });
 
 
