@@ -370,6 +370,40 @@ const getAllRejectedLOR = async (req, res) => {
 
 
 
+const findLorsByExamRollNumber = async (req, res) => {
+    try {
+        const { examRollNumber } = req.body;
+
+        // Find the user by examRollNumber
+        const user = await User.findOne({ examRollNumber }).select(
+            "-password -refreshToken"
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                status: 404,
+                message: "User not found"
+            });
+        }
+
+        // Find all LORs associated with the user
+        const lors = await Lor.find({ user: user._id });
+
+        return res.status(200).json({
+            status: 200,
+            message: "User and LORs found successfully",
+            user,
+            lors
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: "Internal Server Error on findLorsByExamRollNumber Controller",
+            error: error.message
+        });
+    }
+}
 
 
 
@@ -377,4 +411,6 @@ const getAllRejectedLOR = async (req, res) => {
 
 
 
-export { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR }
+
+
+export { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber }
