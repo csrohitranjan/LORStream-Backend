@@ -84,7 +84,10 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const { examRollNumber, email, password } = req.body;
+        let { examRollNumber, email, password } = req.body;
+
+        // Convert examRollNumber to uppercase 
+        examRollNumber = examRollNumber.replace(/\s+/g, '').toUpperCase();
 
         if (!((email && password) || (examRollNumber && password))) {
             return res.status(400).json({
