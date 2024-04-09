@@ -9,7 +9,7 @@ dotenv.config()
 
 export const userAuth = async (req, res, next) => {
     try {
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer", "")
+        const token = req.cookies?.accessToken || (req.headers?.authorization && req.headers.authorization.replace("Bearer ", ""));
 
         if (!token) {
             return res.status(401)
