@@ -269,6 +269,7 @@ const approveLORrequest = async (req, res) => {
 const rejectLORrequest = async (req, res) => {
     try {
         const lorId = req.params.lorId;
+        const { reasonOfRejection } = req.body;
 
         // Finding LOR
         const lor = await Lor.findById(lorId);
@@ -294,7 +295,8 @@ const rejectLORrequest = async (req, res) => {
             });
         }
 
-        // Update current status to rejected
+        // Update current status to rejected & reason of Rejection
+        lor.reasonOfRejection = reasonOfRejection;
         lor.status = 'rejected';
         await lor.save({ validateBeforeSave: false });
         return res.status(200).json({

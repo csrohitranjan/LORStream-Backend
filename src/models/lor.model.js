@@ -37,6 +37,9 @@ const lorSchema = new mongoose.Schema({
     },
     approvedBy: {
         type: String
+    },
+    reasonOfRejection: {
+        type: String
     }
 }, { timestamps: true });
 
