@@ -3,14 +3,14 @@ const router = Router();
 import { userAuth } from "../middlewares/userAuth.middleware.js";
 import { isStudentAuth } from "../middlewares/isStudentAuth.middleware.js";
 import { isAdminAuth } from "../middlewares/isAdminAuth.middleware.js";
-import { home, registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout } from "../controllers/user.controller.js";
+import { registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout } from "../controllers/user.controller.js";
 import { requestLOR, getAllLorsOfLoggedInUser } from "../controllers/student.controller.js";
 import { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber } from "../controllers/admin.controller.js";
 
 
 
 // ######################   GENERAL ROUTES ############################
-router.route("/").get(home);
+
 router.route("/registerUser").post(registerUser); // Later on We set this that only Admin can Register User
 router.route("/loginUser").post(loginUser);
 router.route("/forgetPassword").post(forgetPassword);
@@ -40,7 +40,7 @@ router.route("/:lorId/rejectLORrequest").post(userAuth, isAdminAuth, rejectLORre
 router.route("/allPendingLOR").get(userAuth, isAdminAuth, getAllPendingLOR);
 router.route("/allApprovedLOR").get(userAuth, isAdminAuth, getAllApprovedLOR);
 router.route("/allRejectedLOR").get(userAuth, isAdminAuth, getAllRejectedLOR);
-router.route("/findLorsByExamRollNumber").get(userAuth, isAdminAuth, findLorsByExamRollNumber);
+router.route("/:examRollNumber/findLorsByExamRollNumber").get(userAuth, isAdminAuth, findLorsByExamRollNumber);
 
 
 

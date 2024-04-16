@@ -30,7 +30,6 @@ const userSchema = new mongoose.Schema({
     programme: {    //  -> B.Sc (Honours) Computer Application
         type: String,
         required: true
-
     },
     department: {   // -> BCA
         type: String,

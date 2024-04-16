@@ -16,6 +16,7 @@ const registerAsAdmin = async (req, res) => {
         if (!fullName || !email || !phoneNumber) {
             return res.status(400).json({
                 status: 400,
+                success: false,
                 message: "All fields are required except password."
             });
         }
@@ -24,10 +25,15 @@ const registerAsAdmin = async (req, res) => {
         email = email.replace(/\s+/g, '');
         phoneNumber = phoneNumber.replace(/\s+/g, '').toUpperCase();
 
+        // Concatenate fullName and phoneNumber for registrationNumber and examRollNumber
+        const registrationNumber = fullName.replace(/\s+/g, '').toUpperCase() + phoneNumber.replace(/\s+/g, '');
+        const examRollNumber = fullName.replace(/\s+/g, '').toUpperCase() + phoneNumber.replace(/\s+/g, '').toUpperCase();
+
         // Set password as last five digits of examRollNumber if not provided
         if (!password) {
             password = phoneNumber.substr(-5); // Extract last five characters
         }
+
 
         const existedUser = await User.findOne({
             $or: [{ email }, { phoneNumber }]
@@ -36,6 +42,7 @@ const registerAsAdmin = async (req, res) => {
         if (existedUser && existedUser.role === 'admin') {
             return res.status(409).json({
                 status: 409,
+                success: false,
                 message: "Admin already Registered"
             });
         }
@@ -45,11 +52,13 @@ const registerAsAdmin = async (req, res) => {
             if (existedUser.email === email) {
                 return res.status(409).json({
                     status: 409,
-                    message: "Email is already registered"
+                    success: false,
+                    message: "Email is already registered",
                 });
             } else {
                 return res.status(409).json({
                     status: 409,
+                    success: false,
                     message: "Phone number is already registered"
                 });
             }
@@ -59,8 +68,8 @@ const registerAsAdmin = async (req, res) => {
             fullName,
             fatherName: 'NA',
             classRollNumber: 'NA',
-            registrationNumber: 'NA',
-            examRollNumber: 'NA',
+            registrationNumber,
+            examRollNumber,
             programme: 'NA',
             department: 'NA',
             role: 'admin', // Set the role to 'admin'
@@ -76,12 +85,14 @@ const registerAsAdmin = async (req, res) => {
         if (!createdUser) {
             return res.status(500).json({
                 status: 500,
+                success: false,
                 message: "Something Went Wrong While Registering the Admin"
             });
         }
 
         return res.status(201).json({
             status: 201,
+            success: true,
             message: "Admin Registered Successfully",
             user: createdUser
         });
@@ -89,8 +100,9 @@ const registerAsAdmin = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal Server Error on: registerAsAdmin Controller",
-            error
+            error: error.message
         });
     }
 }
@@ -99,7 +111,7 @@ const registerAsAdmin = async (req, res) => {
 
 const updateLORrequest = async (req, res) => {
     try {
-        const lorId = req.params.lorId;
+        const { lorId } = req.params;
 
         const { recipient, recipientDepartment, companyName, companyAddress } = req.body;
 
@@ -123,6 +135,7 @@ const updateLORrequest = async (req, res) => {
         if (Object.keys(updateFields).length === 0) {
             return res.status(400).json({
                 status: 400,
+                success: false,
                 message: "No fields provided for update."
             });
         }
@@ -133,6 +146,7 @@ const updateLORrequest = async (req, res) => {
         if (!lor) {
             return res.status(404).json({
                 status: 404,
+                success: false,
                 message: "LOR not found"
             })
         }
@@ -142,6 +156,7 @@ const updateLORrequest = async (req, res) => {
         // Return success response with updated Lor data
         return res.status(200).json({
             status: 200,
+            success: true,
             message: "Lor data updated successfully.",
             user: updatedLor
         });
@@ -149,7 +164,7 @@ const updateLORrequest = async (req, res) => {
         return res.status(500).json({
             status: 500,
             message: "Internal server error occurred in updateLORrequest Controller",
-            error
+            error: error.message
         });
     }
 }
@@ -159,7 +174,7 @@ const updateLORrequest = async (req, res) => {
 const approveLORrequest = async (req, res) => {
     try {
         // Extract LOR ID from request parameters
-        const lorId = req.params.lorId;
+        const { lorId } = req.params;
 
         // Find the LOR and populate the user details
         const lor = await Lor.findById(lorId).populate('user', '-password -refreshToken');
@@ -167,6 +182,7 @@ const approveLORrequest = async (req, res) => {
         if (!lor) {
             return res.status(404).json({
                 status: 404,
+                success: false,
                 message: "LOR not found"
             });
         }
@@ -174,6 +190,7 @@ const approveLORrequest = async (req, res) => {
         if (lor.status === "approved") {
             return res.status(403).json({
                 status: 403,
+                success: false,
                 message: "Operation declined: LOR already approved"
             });
         }
@@ -181,6 +198,7 @@ const approveLORrequest = async (req, res) => {
         if (!lor.recipient) {
             return res.status(403).json({
                 status: 403,
+                success: false,
                 message: "Operation declined: Recipient and Recipent Department (Optional) Missing",
             });
         }
@@ -252,14 +270,16 @@ const approveLORrequest = async (req, res) => {
 
         return res.status(200).json({
             status: 200,
+            success: true,
             message: "LOR request approved successfully",
             lor
         });
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: 'Internal server error on approveLORrequest controller',
-            error
+            error: error.message
         });
     }
 };
@@ -268,7 +288,7 @@ const approveLORrequest = async (req, res) => {
 
 const rejectLORrequest = async (req, res) => {
     try {
-        const lorId = req.params.lorId;
+        const { lorId } = req.params;
         const { reasonOfRejection } = req.body;
 
         // Finding LOR
@@ -277,6 +297,7 @@ const rejectLORrequest = async (req, res) => {
         if (!lor) {
             return res.status(404).json({
                 status: 404,
+                success: false,
                 message: "LOR not found"
             })
         }
@@ -284,6 +305,7 @@ const rejectLORrequest = async (req, res) => {
         if (lor.status === "approved") {
             return res.status(403).json({
                 status: 404,
+                success: false,
                 message: "Operation declined: LOR already approved - You can't Reject it"
             });
         }
@@ -291,6 +313,7 @@ const rejectLORrequest = async (req, res) => {
         if (lor.status === "rejected") {
             return res.status(403).json({
                 status: 404,
+                success: false,
                 message: "Operation declined: LOR already rejected"
             });
         }
@@ -301,6 +324,7 @@ const rejectLORrequest = async (req, res) => {
         await lor.save({ validateBeforeSave: false });
         return res.status(200).json({
             status: 200,
+            success: true,
             message: "LOR request Rejected successfully",
             lor
         })
@@ -309,8 +333,9 @@ const rejectLORrequest = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: 'Internal server error on rejectLORrequest Controller',
-            error
+            error: error.message
         });
     }
 }
@@ -322,13 +347,15 @@ const getAllPendingLOR = async (req, res) => {
         const pendingLORs = await Lor.find({ status: 'pending' }).populate('user', '-password -refreshToken');
         return res.status(200).json({
             status: 200,
+            success: true,
             pendingLORs
         });
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal Server Error on getAllPendingLOR Controller",
-            error
+            error: error.message
         });
     }
 };
@@ -340,13 +367,15 @@ const getAllApprovedLOR = async (req, res) => {
         const approvedLORs = await Lor.find({ status: 'approved' }).populate('user', '-password -refreshToken');
         return res.status(200).json({
             status: 200,
+            success: true,
             approvedLORs
         });
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal Server Error on getAllApprovedLOR Controller",
-            error
+            error: error.message
         });
     }
 };
@@ -358,13 +387,15 @@ const getAllRejectedLOR = async (req, res) => {
         const rejectedLORs = await Lor.find({ status: 'rejected' }).populate('user', '-password -refreshToken');
         return res.status(200).json({
             status: 200,
+            success: true,
             rejectedLORs
         });
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal Server Error on getAllApprovedLOR Controller",
-            error
+            error: error.message
         });
     }
 }
@@ -374,7 +405,7 @@ const getAllRejectedLOR = async (req, res) => {
 
 const findLorsByExamRollNumber = async (req, res) => {
     try {
-        const { examRollNumber } = req.body;
+        const { examRollNumber } = req.params;
 
         // Find the user by examRollNumber
         const user = await User.findOne({ examRollNumber }).select(
@@ -384,6 +415,7 @@ const findLorsByExamRollNumber = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 status: 404,
+                success: false,
                 message: "User not found"
             });
         }
@@ -393,6 +425,7 @@ const findLorsByExamRollNumber = async (req, res) => {
 
         return res.status(200).json({
             status: 200,
+            success: true,
             message: "User and LORs found successfully",
             user,
             lors
@@ -401,6 +434,7 @@ const findLorsByExamRollNumber = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal Server Error on findLorsByExamRollNumber Controller",
             error: error.message
         });

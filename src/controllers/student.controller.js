@@ -8,6 +8,8 @@ const requestLOR = async (req, res) => {
 
         if (!(companyName && companyAddress)) {
             return res.status(400).json({
+                status: 400,
+                success: false,
                 message: "Company Name and Company Address is required"
             })
         }
@@ -30,14 +32,17 @@ const requestLOR = async (req, res) => {
         await lor.save();
 
         return res.status(200).json({
+            status: 200,
+            success: true,
             message: "LOR requested successfully",
             companyName, companyAddress
         });
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal server error on requestLOR Controller.",
-            error
+            error: error.message
         });
     }
 };
@@ -56,13 +61,15 @@ const getAllLorsOfLoggedInUser = async (req, res) => {
         // Return the list of LORs as a response
         return res.status(200).json({
             status: 200,
+            success: true,
             userLors
         })
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal Server Error on getAllLorsofLoggedInUser Controller",
-            error
+            error: error.message
         });
     }
 };

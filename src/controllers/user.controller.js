@@ -4,12 +4,6 @@ import { generateAccessAndRefreshTokens } from "../utils/generateAccessAndRefres
 
 
 
-const home = (req, res) => {
-    return res.status(200).send("<h1>Welcome to User Controllers Page</h1>");
-};
-
-
-
 const registerUser = async (req, res) => {
     try {
         let { fullName, fatherName, classRollNumber, registrationNumber, examRollNumber, programme, department, password } = req.body;
@@ -39,6 +33,7 @@ const registerUser = async (req, res) => {
         if (existedUser) {
             return res.status(409).json({
                 status: 409,
+                success: false,
                 message: "User already Registered"
             });
         }
@@ -61,12 +56,14 @@ const registerUser = async (req, res) => {
         if (!createdUser) {
             return res.status(500).json({
                 status: 500,
+                success: false,
                 message: "Something Went Wrong While Registering the User"
             });
         }
 
-        return res.status(201).json({
-            status: 201,
+        return res.status(200).json({
+            status: 200,
+            success: true,
             message: "User Registered Successfully",
             user: createdUser
         });
@@ -74,8 +71,9 @@ const registerUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal Server Error on: registerUser Controller",
-            error
+            error: error.message
         });
     }
 };
@@ -87,13 +85,14 @@ const loginUser = async (req, res) => {
         let { examRollNumber, email, password } = req.body;
 
         // Convert examRollNumber to uppercase 
-        if(examRollNumber){
+        if (examRollNumber) {
             examRollNumber = examRollNumber.replace(/\s+/g, '').toUpperCase();
         }
 
         if (!((email && password) || (examRollNumber && password))) {
             return res.status(400).json({
                 status: 400,
+                success: false,
                 message: "Email or Exam Roll Number and Password are required"
             });
         }
@@ -110,6 +109,7 @@ const loginUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 status: 404,
+                success: false,
                 message: "User Does not Exist"
             });
         }
@@ -119,6 +119,7 @@ const loginUser = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({
                 status: 401,
+                success: false,
                 message: "Wrong Password"
             });
         }
@@ -139,6 +140,7 @@ const loginUser = async (req, res) => {
             .cookie("refreshToken", refreshToken, options)
             .json({
                 status: 200,
+                success: true,
                 message: "User Logged in Successfully",
                 user: loggedInUser,
                 accessToken,
@@ -147,8 +149,9 @@ const loginUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal server error occurred in login Controller.",
-            error
+            error: error.message
         });
     }
 };
@@ -163,6 +166,7 @@ const forgetPassword = async (req, res) => {
         if (!fullName || !fatherName || !examRollNumber || !registrationNumber || !email || !phoneNumber || !newPassword) {
             return res.status(400).json({
                 status: 400,
+                success: false,
                 message: "All fields are required."
             });
         }
@@ -181,6 +185,7 @@ const forgetPassword = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 status: 404,
+                success: false,
                 message: "User not found. Please provide correct details."
             });
         }
@@ -191,13 +196,15 @@ const forgetPassword = async (req, res) => {
 
         return res.status(200).json({
             status: 200,
+            success: true,
             message: "Password updated successfully."
         });
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal server error occurred on forget password controller.",
-            error
+            error: error.message
         });
     }
 };
@@ -217,12 +224,14 @@ const updateProfile = async (req, res) => {
             if (email !== undefined && existingUser.email === email) {
                 return res.status(409).json({
                     status: 409,
+                    success: false,
                     message: "Email is already registered"
                 });
             }
             if (phoneNumber !== undefined && existingUser.phoneNumber === phoneNumber) {
                 return res.status(409).json({
                     status: 409,
+                    success: false,
                     message: "Phone number is already registered"
                 });
             }
@@ -249,6 +258,7 @@ const updateProfile = async (req, res) => {
         if (Object.keys(updateFields).length === 0) {
             return res.status(400).json({
                 status: 400,
+                success: false,
                 message: "No fields provided for update."
             });
         }
@@ -259,6 +269,7 @@ const updateProfile = async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({
                 status: 404,
+                success: false,
                 message: "User not found."
             });
         }
@@ -266,14 +277,16 @@ const updateProfile = async (req, res) => {
         // Return success response with updated user data
         return res.status(200).json({
             status: 200,
+            success: true,
             message: "Student data updated successfully.",
             user: updatedUser
         });
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal server error occurred in updateProfile Controller",
-            error
+            error: error.message
         });
     }
 };
@@ -287,6 +300,7 @@ const changePassword = async (req, res) => {
         if (!oldPassword || !newPassword) {
             return res.status(400).json({
                 status: 400,
+                success: false,
                 message: "Old Password & New Password are required"
             })
         }
@@ -294,6 +308,7 @@ const changePassword = async (req, res) => {
         if (oldPassword === newPassword) {
             return res.status(401).json({
                 status: 401,
+                success: false,
                 message: "Old Password & New Password Can not be Same"
             })
         }
@@ -306,6 +321,7 @@ const changePassword = async (req, res) => {
             return res.status(400)
                 .json({
                     status: 400,
+                    success: false,
                     message: "Invalid Old Password"
                 })
         }
@@ -316,13 +332,15 @@ const changePassword = async (req, res) => {
         return res.status(200)
             .json({
                 status: 200,
+                success: true,
                 message: "Password Changed Successfully"
             })
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal server error occurred in changePassword Controller",
-            error
+            error: error.message
         });
     }
 }
@@ -334,14 +352,16 @@ const getCurrentUser = (req, res) => {
         return res.status(200)
             .json({
                 status: 200,
+                success: true,
                 message: "Current User Fetched Successfully",
                 user: req.user
             })
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal server error occurred in getCurrentUser Controller",
-            error
+            error: error.message
         });
     }
 }
@@ -372,13 +392,15 @@ const logout = async (req, res) => {
             .clearCookie("refreshToken", options)
             .json({
                 status: 200,
+                success: true,
                 message: "User Logged Out"
             })
     } catch (error) {
         return res.status(500).json({
             status: 500,
+            success: false,
             message: "Internal server error occurred in logout Controller",
-            error
+            error: error.message
         });
     }
 
@@ -391,4 +413,4 @@ const logout = async (req, res) => {
 
 
 
-export { home, registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout }
+export { registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout }

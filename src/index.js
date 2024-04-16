@@ -5,10 +5,13 @@ import connectDB from "./db/dbConnection.js";
 
 
 
-
-
-app.listen(process.env.PORT, () => {
-    console.log(`Server is Running on ${process.env.PORT}`)
-})
-
 connectDB()
+    .then(() => {
+        app.listen(process.env.PORT, () => {
+            console.log(`SERVER is Running at ${process.env.PORT}`)
+        });
+        app.on("error", (error) => {
+            console.log("ERROR: ", error)
+            throw error;
+        })
+    });
