@@ -1,7 +1,9 @@
 import { User } from "../models/user.model.js";
 import { generateAccessAndRefreshTokens } from "../utils/generateAccessAndRefreshTokens.js";
-
-
+import { generateRandomPassword } from "../utils/generateRandomPassword.js"
+import nodemailer from 'nodemailer';
+import dotenv from "dotenv";
+dotenv.config();
 
 
 const registerUser = async (req, res) => {
@@ -160,10 +162,10 @@ const loginUser = async (req, res) => {
 
 const forgetPassword = async (req, res) => {
     try {
-        const { fullName, fatherName, examRollNumber, registrationNumber, email, phoneNumber, newPassword } = req.body;
+        const { registrationNumber, email } = req.body;
 
         // Validate if all required fields are provided
-        if (!fullName || !fatherName || !examRollNumber || !registrationNumber || !email || !phoneNumber || !newPassword) {
+        if (!registrationNumber || !email) {
             return res.status(400).json({
                 status: 400,
                 success: false,
@@ -173,15 +175,10 @@ const forgetPassword = async (req, res) => {
 
         // Find the user based on the provided details
         const user = await User.findOne({
-            fullName,
-            fatherName,
-            examRollNumber,
             registrationNumber,
             email,
-            phoneNumber
         });
 
-        // Check if the user exists
         if (!user) {
             return res.status(404).json({
                 status: 404,
@@ -190,15 +187,69 @@ const forgetPassword = async (req, res) => {
             });
         }
 
-        // Update user's password
-        user.password = newPassword
-        await user.save({ validateBeforeSave: false })
+        const newPassword = generateRandomPassword(12);
 
-        return res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Password updated successfully."
+        // Send new password to user's email
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail', // Use your email service provider
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.EMAIL_PASSWORD
+            }
         });
+
+        const mailOptions = {
+            from: '"College ERP" <rrcovid2019@gmail.com>',
+            to: user.email,
+            subject: 'Your New Password for College ERP',
+            html: `
+                <div style="font-family: Arial, sans-serif;">
+                    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);">
+                        <div style="background-color: #007bff; color: #ffffff; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+                            <h1 style="font-size: 28px; margin: 0;">🎓 College ERP</h1>
+                        </div>
+                        <div style="padding: 20px;">
+                            <h2 style="color: #007bff; margin-top: 0;">Hello,</h2>
+                            <p style="font-size: 16px; margin-bottom: 10px;">We have received a request to reset your password for your College ERP account.</p>
+                            <div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
+                                <p style="font-size: 16px; margin: 0;">Your new password is: <strong>${newPassword}</strong></p>
+                            </div>
+                            <p style="font-size: 16px; margin-top: 10px;">For security reasons, we recommend changing this password after logging in.</p>
+                            <p style="font-size: 16px; margin-top: 10px;">If you didn't request this password change, please contact our support team immediately.</p>
+                            <p style="font-size: 16px; margin-top: 20px;">Best regards,<br/>College ERP Team</p>
+                        </div>
+                        <div style="background-color: #007bff; color: #ffffff; text-align: center; padding: 10px; border-radius: 0 0 10px 10px;">
+                            <p style="font-size: 14px; margin: 0;">This is an automated email, please do not reply.</p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+
+        transporter.sendMail(mailOptions, async (error, info) => {
+            if (error) {
+                console.error('Error occurred while sending email:', error);
+                return res.status(500).json({
+                    status: 500,
+                    success: false,
+                    message: "Failed to send email with new password.",
+                    error: error.message
+                });
+            } else {
+                // console.log('Email sent:', info.response);
+                // Update user's password after successfully sending the email
+                user.password = newPassword;
+                await user.save({ validateBeforeSave: false });
+
+                return res.status(200).json({
+                    status: 200,
+                    success: true,
+                    message: "Password Reset successfully. New password sent to your email.",
+                });
+            }
+        });
+
     } catch (error) {
         return res.status(500).json({
             status: 500,
