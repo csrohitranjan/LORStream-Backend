@@ -23,11 +23,17 @@ import userRouter from "./routes/user.routes.js";
 // ##########      Routes Declaration   ############################
 
 app.get('/', (req, res) => {
-    res.status(200).send("<h1>Welcome to College ERP Project</h1>");
+    res.status(200).send(`
+        <div style="text-align: center;">
+            <h1>Welcome to College ERP</h1>
+            <p>Developed by Mr. Rohit Ranjan</p>
+            <p>😊🎓📚</p>
+        </div>
+    `);
 });
 
 
-app.use("/api/v2/users", userRouter);
+app.use("/api/v1/users", userRouter);
 
 
 
