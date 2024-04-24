@@ -5,7 +5,7 @@ import { uploadOnFirebase } from "../utils/firebase.js";
 import { generateReferenceNumber } from "../utils/generateReferenceNumber.js";
 import { generatePdfFromTemplate } from "../utils/generatePdfFromTemplate.js";
 import fs from "fs";
-
+import { sendMail } from "../utils/sendMail.js"
 
 
 const registerAsAdmin = async (req, res) => {
@@ -267,6 +267,41 @@ const approveLORrequest = async (req, res) => {
         lor.approvedBy = approvingUser.fullName;
 
         await lor.save();
+
+        const mailOptions = {
+            from: '"College ERP" <rrcovid2019@gmail.com>',
+            to: user.email,
+            subject: '🎉 Your LOR Request Approved!',
+            html: `
+            <div style="font-family: Arial, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);">
+             <div style="background-color: #007bff; color: #ffffff; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="font-size: 28px; margin: 0;">🎓 College ERP</h1>
+            </div>
+            <div style="padding: 20px;">
+            <h4 style="margin-top: 0;">Dear ${user.fullName},</h4>
+            <p style="font-size: 16px; margin-bottom: 10px;">We are pleased to inform you that your request for a Letter of Recommendation (LOR) has been approved. Below are the details:</p>
+            <ul style="font-size: 16px; margin-top: 0;">
+                <li><strong>Company Name:</strong> ${lor.companyName}</li>
+                <li><strong>Company Address:</strong> ${lor.companyAddress}</li>
+                <li><strong>Reference No.:</strong> ${lor.referenceNumber}</li>
+            </ul>
+            <p style="font-size: 16px; margin-top: 10px;">You can download your Letter of Recommendation (LOR) by clicking the button below:</p>
+            <p style="text-align: center;">
+                <a href="${lor.lorPdfLink}" style="background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 16px;">Download LOR</a>
+            </p>
+            <p style="font-size: 16px; margin-top: 20px;">If you have any questions or need further assistance, feel free to contact our support team.</p>
+            <p style="font-size: 16px; margin-top: 20px;">Best regards,<br/>College ERP Team</p>
+            </div>
+            <div style="background-color: #007bff; color: #ffffff; text-align: center; padding: 10px; border-radius: 0 0 10px 10px;">
+            <p style="font-size: 14px; margin: 0;">Designed and developed by Mr. Rohit Ranjan <a href="https://www.linkedin.com/in/csrohitranjan/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" style="width: 15px; vertical-align: middle;"></a></p>
+            </div>
+            </div>
+            </div>
+            `
+        };
+
+        await sendMail(mailOptions);
 
         return res.status(200).json({
             status: 200,
