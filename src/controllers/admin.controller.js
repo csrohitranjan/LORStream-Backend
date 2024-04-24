@@ -328,10 +328,6 @@ const rejectLORrequest = async (req, res) => {
 
         // Finding LOR
         const lor = await Lor.findById(lorId);
-        const { user } = lor;
-        // console.log(user);
-        const linkedUser = await User.findById(user);
-        // console.log("Linked User",linkedUser)
 
         if (!lor) {
             return res.status(404).json({
@@ -339,6 +335,18 @@ const rejectLORrequest = async (req, res) => {
                 success: false,
                 message: "LOR not found"
             })
+        }
+
+        const { user } = lor;
+        // console.log(user);
+        const linkedUser = await User.findById(user);
+        // console.log("Linked User",linkedUser)
+        if (!linkedUser) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "User linked to LOR not found"
+            });
         }
 
         if (lor.status === "approved") {
