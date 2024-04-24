@@ -192,7 +192,7 @@ const forgetPassword = async (req, res) => {
         const mailOptions = {
             from: '"College ERP" <rrcovid2019@gmail.com>',
             to: user.email,
-            subject: 'Your New Password for College ERP',
+            subject: '🔒 Your New College ERP Password',
             html: `
                 <div style="font-family: Arial, sans-serif;">
                     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);">
