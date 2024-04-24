@@ -4,6 +4,8 @@ import { generateRandomPassword } from "../utils/generateRandomPassword.js"
 import nodemailer from 'nodemailer';
 import dotenv from "dotenv";
 dotenv.config();
+import { sendMail } from "../utils/sendMail.js"
+
 
 
 const registerUser = async (req, res) => {
@@ -164,7 +166,6 @@ const forgetPassword = async (req, res) => {
     try {
         const { registrationNumber, email } = req.body;
 
-        // Validate if all required fields are provided
         if (!registrationNumber || !email) {
             return res.status(400).json({
                 status: 400,
@@ -173,7 +174,6 @@ const forgetPassword = async (req, res) => {
             });
         }
 
-        // Find the user based on the provided details
         const user = await User.findOne({
             registrationNumber,
             email,
@@ -188,15 +188,6 @@ const forgetPassword = async (req, res) => {
         }
 
         const newPassword = generateRandomPassword(12);
-
-        // Send new password to user's email
-        const transporter = nodemailer.createTransport({
-            service: 'Gmail', // Use your email service provider
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.EMAIL_PASSWORD
-            }
-        });
 
         const mailOptions = {
             from: '"College ERP" <rrcovid2019@gmail.com>',
@@ -226,30 +217,16 @@ const forgetPassword = async (req, res) => {
             `
         };
 
+        await sendMail(mailOptions);
 
-        transporter.sendMail(mailOptions, async (error, info) => {
-            if (error) {
-                console.error('Error occurred while sending email:', error);
-                return res.status(500).json({
-                    status: 500,
-                    success: false,
-                    message: "Failed to send email with new password.",
-                    error: error.message
-                });
-            } else {
-                // console.log('Email sent:', info.response);
-                // Update user's password after successfully sending the email
-                user.password = newPassword;
-                await user.save({ validateBeforeSave: false });
-
-                return res.status(200).json({
-                    status: 200,
-                    success: true,
-                    message: "Password Reset successfully. New password sent to your email.",
-                });
-            }
+        // Update user's password after successfully sending the email
+        user.password = newPassword;
+        await user.save({ validateBeforeSave: false });
+        return res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Password Reset successfully. New password sent to your email.",
         });
-
     } catch (error) {
         return res.status(500).json({
             status: 500,
