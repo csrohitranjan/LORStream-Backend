@@ -210,7 +210,7 @@ const forgetPassword = async (req, res) => {
                             <p style="font-size: 16px; margin-top: 20px;">Best regards,<br/>College ERP Team</p>
                         </div>
                         <div style="background-color: #007bff; color: #ffffff; text-align: center; padding: 10px; border-radius: 0 0 10px 10px;">
-                            <p style="font-size: 14px; margin: 0;">This is an automated email, please do not reply.</p>
+                        <p style="font-size: 14px; margin: 0;">Designed and developed by Mr. Rohit Ranjan <a href="https://www.linkedin.com/in/csrohitranjan/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" style="width: 15px; vertical-align: middle;"></a></p>
                         </div>
                     </div>
                 </div>
