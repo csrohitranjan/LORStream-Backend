@@ -1,4 +1,6 @@
 import { Lor } from "../models/lor.model.js";
+import nodemailer from 'nodemailer';
+import { sendMail } from "../utils/sendMail.js"
 
 
 const requestLOR = async (req, res) => {
@@ -30,6 +32,37 @@ const requestLOR = async (req, res) => {
 
         // Save LOR document
         await lor.save();
+
+        const mailOptions = {
+            from: '"College ERP" <rrcovid2019@gmail.com>',
+            to: user.email,
+            subject: 'Confirmation of LOR Request',
+            html: `
+            <div style="font-family: Arial, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);">
+                <div style="background-color: #007bff; color: #ffffff; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+                    <h1 style="font-size: 28px; margin: 0;">🎓 College ERP</h1>
+                </div>
+                <div style="padding: 20px;">
+                    <h4 style="margin-top: 0;">Dear ${user.fullName},</h4>
+                    <p style="font-size: 16px; margin-bottom: 10px;">Your request for a Letter of Recommendation (LOR) has been received and is being processed. Please find below the details you provided:</p>
+                    <ul style="font-size: 16px; margin-top: 0;">
+                        <li><strong>Company Name:</strong> ${companyName}</li>
+                        <li><strong>Company Address:</strong> ${companyAddress}</li>
+                    </ul>
+                    <p style="font-size: 16px; margin-top: 10px;">Our team will work on preparing the LOR for you. You will receive another email once it's ready for your review and download.</p>
+                    <p style="font-size: 16px; margin-top: 10px;">If you have any questions or need further assistance, feel free to contact our support team.</p>
+                    <p style="font-size: 16px; margin-top: 20px;">Best regards,<br/>College ERP Team</p>
+                </div>
+                <div style="background-color: #007bff; color: #ffffff; text-align: center; padding: 10px; border-radius: 0 0 10px 10px;">
+                    <p style="font-size: 14px; margin: 0;">Designed and developed by Mr. Rohit Ranjan <a href="https://www.linkedin.com/in/csrohitranjan/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" style="width: 15px; vertical-align: middle;"></a></p>
+                </div>
+            </div>
+        </div>
+            `
+        };
+
+        await sendMail(mailOptions);
 
         return res.status(200).json({
             status: 200,
