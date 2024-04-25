@@ -33,7 +33,7 @@ router.route("/getAllLorsOfLoggedInUser").get(userAuth, isStudentAuth, getAllLor
 
 //  #######################   ADMIN SECURED ROUTES   ####################### 
 
-router.route("/registerAsAdmin").post(registerAsAdmin); // We have To modify this in later- Set that Only admin can entroll other Admin
+router.route("/registerAsAdmin").post(userAuth, isAdminAuth, registerAsAdmin); // We have To modify this in later- Set that Only admin can entroll other Admin
 router.route("/:lorId/updateLORrequest").put(userAuth, isAdminAuth, updateLORrequest);
 router.route("/:lorId/approveLORrequest").post(userAuth, isAdminAuth, approveLORrequest);
 router.route("/:lorId/rejectLORrequest").post(userAuth, isAdminAuth, rejectLORrequest);
