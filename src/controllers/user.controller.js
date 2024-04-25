@@ -343,6 +343,15 @@ const changePassword = async (req, res) => {
 
         const user = await User.findById(req.user?._id)
 
+        // Check if user has an email
+        if (!user.email) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "Update your email in your profile before changing your password"
+            })
+        }
+
         const isOldPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
         if (!isOldPasswordCorrect) {
