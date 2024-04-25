@@ -164,7 +164,7 @@ const loginUser = async (req, res) => {
 
 const forgetPassword = async (req, res) => {
     try {
-        const { registrationNumber, email } = req.body;
+        let { registrationNumber, email } = req.body;
 
         if (!registrationNumber || !email) {
             return res.status(400).json({
@@ -173,6 +173,9 @@ const forgetPassword = async (req, res) => {
                 message: "All fields are required."
             });
         }
+
+        // Remove all whitespace characters from registrationNumber fields
+        registrationNumber = registrationNumber.replace(/\s+/g, '').toUpperCase();
 
         const user = await User.findOne({
             registrationNumber,
