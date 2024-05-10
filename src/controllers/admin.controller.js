@@ -520,6 +520,38 @@ const findLorsByExamRollNumber = async (req, res) => {
 }
 
 
+const findUserByExamRollNumber = async (req, res) => {
+    const { examRollNumber } = req.params;
+
+    try {
+        const user = await User.findOne({ examRollNumber }).select(
+            "-password -refreshToken"
+        );;
+
+        if (!user) {
+            return res.status(404).json({
+                status: 404,
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        // If user found, send the user details
+        return res.status(200).json({
+            status: 200,
+            success: true,
+            user,
+            message: "User found successfully"
+        })
+    } catch (error) {
+        return res.status(400).json({
+            status: 400,
+            success: false,
+            message: "Insternal Server Error in finUserByExamRollNumber controller",
+            error: error.message
+        })
+    }
+}
 
 
 
@@ -527,4 +559,5 @@ const findLorsByExamRollNumber = async (req, res) => {
 
 
 
-export { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber }
+
+export { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber, findUserByExamRollNumber }
