@@ -233,10 +233,18 @@ const approveLORrequest = async (req, res) => {
 
         // Path of HTML template file
         let templatePath;
-        if (templateData.recipientDepartment !== undefined) {
-            templatePath = './src/templates/csLORtemplateWithRecipientDepartment.html'
-        } else {
-            templatePath = './src/templates/csLORtemplateWithoutRecipientDepartment.html'
+        if (user.gender === 'Male') {
+            if (templateData.recipientDepartment !== undefined) {
+                templatePath = './src/templates/csLORtemplateWithRecipientDepartment_Male.html'
+            } else {
+                templatePath = './src/templates/csLORtemplateWithoutRecipientDepartment_Male.html'
+            }
+        } else if (user.gender === 'Female') {
+            if (templateData.recipientDepartment !== undefined) {
+                templatePath = './src/templates/csLORtemplateWithRecipientDepartment_Female.html'
+            } else {
+                templatePath = './src/templates/csLORtemplateWithoutRecipientDepartment_Female.html'
+            }
         }
 
         // Path where generated PDF will be Saved
@@ -480,7 +488,6 @@ const getAllRejectedLOR = async (req, res) => {
 
 
 
-
 const findLorsByExamRollNumber = async (req, res) => {
     try {
         const { examRollNumber } = req.params;
@@ -518,6 +525,7 @@ const findLorsByExamRollNumber = async (req, res) => {
         });
     }
 }
+
 
 
 const findUserByExamRollNumber = async (req, res) => {

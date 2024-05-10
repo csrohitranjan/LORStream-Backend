@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reference Letter</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+            color: black;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 1mm;
+            /* padding: 0 20mm 20mm 20mm; */
+            margin: 10mm auto;
+            background: white;
+            position: relative;
+            border: 2px solid black;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .letter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .letter-header p {
+            margin: 5px 15px;
+        }
+
+        .department-info p:not(:nth-child(3)) {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        /* Control Logo Left Right Form Here */
+        .college-logo {
+            width: 120px;
+            /* margin: 20px 30px 0 30px; */
+            /*Adjust margin to move logo slightly to the right*/
+        }
+
+        .contact-info {
+            flex: 1;
+            text-align: right;
+        }
+
+        .contact-info p {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .reference-number {
+            font-size: 1.1em;
+            text-align: right;
+            margin-top: 10px;
+            padding: 0 10mm;
+        }
+
+        .letter-body {
+            font-size: 1.1em;
+            line-height: 1.5;
+            padding: 0 10mm;
+            text-align: justify;
+        }
+
+        .letter-body p {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .signature-block {
+            font-size: 1.1em;
+            margin-top: 40px;
+            text-align: left;
+            padding: 0 10mm;
+        }
+
+        .signature-block p {
+            margin: 5px 0;
+        }
+
+        .horizontal-line {
+            border: 1px solid black;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="letter-header">
+            <div class="department-info">
+                <p>DEPARTMENT OF COMPUTER SCIENCE</p>
+                <p>ST. XAVIER'S COLLEGE</p>
+                <p>(An Autonomous College of Ranchi University)</p>
+                <p>RANCHI, JHARKHAND</p>
+            </div>
+            <img src="data:image/jpeg;base64,{{image}}" alt="St. Xavier's College Logo" class="college-logo">
+            <div class="contact-info">
+                <p>Tel: 0651-2214 301, 2214 935</p>
+                <p>Fax: 0651-2207 672</p>
+                <p>E-Mail: cs@sxcran.org</p>
+                <p>Website: www.sxcran.org</p>
+            </div>
+        </div>
+        <div class="horizontal-line"></div>
+        <div class="reference-number">
+            <span>Reference Number: - {{referenceNumber}}</span>
+        </div>
+        <div class="letter-body">
+            <p>To</p>
+            <p>{{recipient}},</p>
+            <p>{{recipientDepartment}},</p>
+            <p>{{companyName}},</p>
+            <p>{{companyAddress}}</p>
+            <p>Sub: - <span>Permission regarding internship in your esteemed organization</span>.</p>
+            <p>Dear Sir / Madam,</p>
+            <p>With reference to the above, this is to inform you that <span>Ms. {{fullName}}</span> D/O
+                <span>Mr. {{fatherName}}</span>, bearing
+                Class Roll Number <span>{{classRollNumber}}</span>, Registration Number
+                <span>{{registrationNumber}}</span> and
+                Examination Roll Number <span>{{examRollNumber}}</span> is a bonafide
+                student of <span>{{programme}}</span>, <span>Department of Computer Science, St. Xavier's College,
+                    Ranchi</span>.
+                She is currently studying in the <span>{{currentSemester}}</span> semester. In the sixth semester, she
+                has
+                to
+                undertake an internship to meet the
+                credit requirements of paper <span>BCADSE60488</span>. The credit weightage of the paper is <span>2
+                    credits</span> i.e., <span>30 Lecture Hours</span>.
+            </p>
+            <p>She is keenly interested in undertaking an internship in your esteemed organization. We request you
+                kindly
+                to
+                grant
+                her permission to undertake the internship. It is required to be ensured that the time slot allotted to
+                her to
+                undergo the internship is not matching with her class timings. After successful completion of the
+                internship,
+                she
+                has to <span>submit a project report duly signed / verified by your organization to the Department of
+                    Computer
+                    Science, St. Xavier's College, Ranchi.</span></p>
+            <p>His character and conduct are good to the best of our knowledge.</p>
+            <p>Thank you in advance.</p>
+            <p>With regards,</p>
+        </div>
+        <div class="signature-block">
+            <p>(Surya Narayan Prasad)</p>
+            <p>Assistant Professor,</p>
+            <p>Department of Computer Science</p>
+            <p>St. Xavier's College, Ranchi.</p>
+        </div>
+    </div>
+</body>
+
+</html>
