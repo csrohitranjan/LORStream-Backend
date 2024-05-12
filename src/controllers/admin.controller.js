@@ -563,9 +563,104 @@ const findUserByExamRollNumber = async (req, res) => {
 
 
 
+const updateUserProfileByExamRollNumber = async (req, res) => {
+    try {
+        const { examRollNumber } = req.params;
+        const { fullName, fatherName, classRollNumber, registrationNumber, programme, department, currentSemester, gender, email, phoneNumber } = req.body;
+
+        const user = await User.findOne({ examRollNumber })
+        if (!user) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "No user found from provided ExamRollNumber"
+            });
+        }
+        // Check if email or phoneNumber is already registered
+        const existingUser = await User.findOne({ $or: [{ email }, { phoneNumber }] });
+        // Determine which field is already registered and return corresponding response
+        if (existingUser) {
+            if (email !== undefined && existingUser.email === email) {
+                return res.status(409).json({
+                    status: 409,
+                    success: false,
+                    message: "Email is already registered"
+                });
+            }
+            if (phoneNumber !== undefined && existingUser.phoneNumber === phoneNumber) {
+                return res.status(409).json({
+                    status: 409,
+                    success: false,
+                    message: "Phone number is already registered"
+                });
+            }
+        }
+
+        // Update user data
+        const updateFields = {}; // Initialize an empty object to store fields to update
+
+        // Only include fields in the updateFields object if they are provided in the request body
+        if (fullName) {
+            updateFields.fullName = fullName;
+        }
+        if (fatherName) {
+            updateFields.fatherName = fatherName;
+        }
+        if (classRollNumber) {
+            updateFields.classRollNumber = classRollNumber;
+        }
+        if (registrationNumber) {
+            updateFields.registrationNumber = registrationNumber;
+        }
+        if (programme) {
+            updateFields.programme = programme;
+        }
+        if (department) {
+            updateFields.department = department;
+        }
+        if (currentSemester) {
+            updateFields.currentSemester = currentSemester;
+        }
+        if (gender) {
+            updateFields.gender = gender;
+        }
+        if (email) {
+            updateFields.email = email;
+        }
+        if (phoneNumber) {
+            updateFields.phoneNumber = phoneNumber;
+        }
+
+        // Check if any field to update is provided
+        if (Object.keys(updateFields).length === 0) {
+            return res.status(400).json({
+                status: 400,
+                success: false,
+                message: "No fields provided for update."
+            });
+        }
+
+        // Perform the update operation
+        const updatedUser = await User.findOneAndUpdate({ examRollNumber }, updateFields, { new: true });
+
+        // Return success response with updated user data
+        return res.status(200).json({
+            status: 200,
+            success: true,
+            message: "Student data updated successfully.",
+            user: updatedUser
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            success: false,
+            message: "Internal server error occurred in updateUserProfileBYExamRollNumber Controller",
+            error: error.message
+        });
+    }
+}
 
 
 
 
-
-export { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber, findUserByExamRollNumber }
+export { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber, findUserByExamRollNumber, updateUserProfileByExamRollNumber }

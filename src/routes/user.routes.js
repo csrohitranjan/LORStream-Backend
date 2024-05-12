@@ -5,7 +5,7 @@ import { isStudentAuth } from "../middlewares/isStudentAuth.middleware.js";
 import { isAdminAuth } from "../middlewares/isAdminAuth.middleware.js";
 import { registerUser, loginUser, forgetPassword, updateProfile, changePassword, getCurrentUser, logout } from "../controllers/user.controller.js";
 import { requestLOR, getAllLorsOfLoggedInUser } from "../controllers/student.controller.js";
-import { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber, findUserByExamRollNumber } from "../controllers/admin.controller.js";
+import { registerAsAdmin, updateLORrequest, approveLORrequest, rejectLORrequest, getAllPendingLOR, getAllApprovedLOR, getAllRejectedLOR, findLorsByExamRollNumber, findUserByExamRollNumber, updateUserProfileByExamRollNumber } from "../controllers/admin.controller.js";
 
 
 
@@ -42,7 +42,7 @@ router.route("/allApprovedLOR").get(userAuth, isAdminAuth, getAllApprovedLOR);
 router.route("/allRejectedLOR").get(userAuth, isAdminAuth, getAllRejectedLOR);
 router.route("/:examRollNumber/findLorsByExamRollNumber").get(userAuth, isAdminAuth, findLorsByExamRollNumber);
 router.route("/:examRollNumber/findUserByExamRollNumber").get(userAuth, isAdminAuth, findUserByExamRollNumber);
-
+router.route("/:examRollNumber/updateUserProfileByExamRollNumber").put(userAuth, isAdminAuth, updateUserProfileByExamRollNumber);
 
 
 
