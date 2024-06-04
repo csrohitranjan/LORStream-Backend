@@ -20,6 +20,8 @@ const requestLOR = async (req, res) => {
             return res.status(400).json({ message: "Update Email in your profile" });
         } else if (!user.currentSemester) {
             return res.status(400).json({ message: "Update Current Semester in your profile" });
+        } else if (!user.gender) {
+            return res.status(400).json({ message: "Update Gender in your profile" });
         }
 
         // Create LOR document
