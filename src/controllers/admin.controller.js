@@ -257,10 +257,10 @@ const approveLORrequest = async (req, res) => {
         // ##########   PDF Uploading to Cloud -- START ###########
 
         // Upload PDF to Cloudinary Cloud
-        // const uplodedPdf = await uploadOnCloudinary(outputPath, pdfFileName);
+        const uplodedPdf = await uploadOnCloudinary(outputPath, pdfFileName);
 
         // Upload PDF to FireBase Cloud
-        const uplodedPdf = await uploadOnFirebase(outputPath, pdfFileName);
+        // const uplodedPdf = await uploadOnFirebase(outputPath, pdfFileName);
 
         // ##########   PDF Uploading to Cloud -- END ###########
         if (!uplodedPdf) {
@@ -268,7 +268,7 @@ const approveLORrequest = async (req, res) => {
         }
 
         // If File is Uploded Through Clodinary then we have to use this here --> uplodedPdf.url
-        lor.lorPdfLink = uplodedPdf;
+        lor.lorPdfLink = uplodedPdf.url;
         lor.status = 'approved';
 
         const approvingUser = req.user;
