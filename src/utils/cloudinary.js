@@ -18,7 +18,7 @@ const uploadOnCloudinary = async (pdfFilePath, originalFilename) => {
 
     try {
         const response = await cloudinary.uploader.upload(pdfFilePath, {
-            resource_type: 'auto',
+            resource_type: 'raw',
             public_id: originalFilename
         });
         return response;

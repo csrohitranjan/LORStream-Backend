@@ -267,8 +267,8 @@ const approveLORrequest = async (req, res) => {
             console.log("Uploaded PDF File Missing");
         }
 
-        // If File is Uploded Through Clodinary then we have to use this here --> uplodedPdf.url
-        lor.lorPdfLink = uplodedPdf.url;
+        // If File is Uploded Through Clodinary then we have to use this here --> uplodedPdf.secure_url
+        lor.lorPdfLink = uplodedPdf.secure_url;
         lor.status = 'approved';
 
         const approvingUser = req.user;
